@@ -11,11 +11,11 @@ from dataclasses import dataclass
 class EnhancementConfig:
     """Configuration for conservative image enhancement."""
     
-    # Model settings - Optimized for Ultra-HD quality
-    model_name: str = "RealESRGAN_x4plus"
-    model_scale: int = 4  # Full 4x upscaling for Ultra-HD output
-    tile_size: int = 640  # Larger tiles for maximum quality (was 512)
-    tile_padding: int = 40 # Increased padding for seamless tile blending
+    # Model settings - Using working x4plus model
+    model_name: str = "RealESRGAN_x4plus"  # Use the working x4plus model
+    model_scale: int = 4  # 4x upscaling
+    tile_size: int = 256  # Smaller tiles for CPU processing
+    tile_padding: int = 10 # Reduced padding for speed
     
     # Denoising settings - mild to preserve texture
     denoise_strength: float = 10.0  # OpenCV NLMeans h parameter (lower = less aggressive)

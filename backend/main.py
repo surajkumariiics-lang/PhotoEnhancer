@@ -12,6 +12,7 @@ import logging
 from typing import Optional
 
 from enhancer import get_enhancer
+from simple_enhancer import get_simple_enhancer
 from config import config
 
 logging.basicConfig(level=logging.INFO)
@@ -102,8 +103,16 @@ async def enhance_image(
         logger.info(f"Input image size: {image.size}")
         
         # Enhance image with format selection
-        enhancer = get_enhancer()
-        compressed_data, media_type = enhancer.enhance_with_compression(image, strength=strength, output_format=format.upper())
+        try:
+            enhancer = get_enhancer()
+            compressed_data, media_type = enhancer.enhance_with_compression(image, strength=strength, output_format=format.upper())
+        except Exception as ai_error:
+            logger.warning(f"AI enhancement failed: {ai_error}")
+            logger.info("Falling back to simple enhancement")
+            
+            # Fallback to simple enhancer
+            simple_enhancer = get_simple_enhancer()
+            compressed_data, media_type = simple_enhancer.enhance_with_compression(image, strength=strength, output_format=format.upper())
         
         # Create response buffer
         output_buffer = io.BytesIO(compressed_data)

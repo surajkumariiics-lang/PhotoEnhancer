@@ -52,24 +52,30 @@ class ImageEnhancer:
 
         # Model settings from config
         model_path = f"weights/{config.model_name}.pth"
-        url = f"https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/{config.model_name}.pth"
+        
+        # Use correct download URL based on model
+        if config.model_name == "RealESRGAN_x4plus":
+            url = "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth"
+            model_scale = 4
+        elif config.model_name == "RealESRGAN_x2plus":
+            url = "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.1/RealESRGAN_x2plus.pth"
+            model_scale = 2
+        else:
+            url = f"https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/{config.model_name}.pth"
+            model_scale = 4
         
         self._download_weights(url, model_path)
         
-        # Initialize model architecture
-        model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=4)
+        # Initialize model architecture - use standard 3-channel architecture
+        model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=model_scale)
         
         # Load weights
-        try:
-            loadnet = torch.load(model_path, map_location=self.device)
-            if 'params_ema' in loadnet:
-                keyname = 'params_ema'
-            else:
-                keyname = 'params'
-            model.load_state_dict(loadnet[keyname], strict=True)
-        except Exception as e:
-            logger.error(f"Failed to load model weights: {e}")
-            raise
+        loadnet = torch.load(model_path, map_location=self.device, weights_only=False)
+        if 'params_ema' in loadnet:
+            keyname = 'params_ema'
+        else:
+            keyname = 'params'
+        model.load_state_dict(loadnet[keyname], strict=True)
             
         model.eval()
         model = model.to(self.device)
