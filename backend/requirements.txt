@@ -1,0 +1,16 @@
+# Core web framework
+fastapi
+uvicorn[standard]
+python-multipart
+
+# Image processing
+pillow
+opencv-python
+numpy
+
+# PyTorch (Standard CPU version)
+--index-url https://download.pytorch.org/whl/cpu
+torch
+torchvision
+
+requests
